@@ -16,7 +16,6 @@ export default class IconfontPlugin {
     }
 
     this.options = Object.assign({}, options);
-    this.fileDependencies = [];
     this.hashes = {};
 
     this.compile = this.compile.bind(this);
@@ -85,8 +84,16 @@ export default class IconfontPlugin {
 
     globPatterns.forEach(globPattern => {
       const context = globParent(globPattern);
-      if (compilation.contextDependencies.indexOf(context) === -1) {
-        compilation.contextDependencies.push(context);
+      const contextDependencies = compilation.contextDependencies;
+
+      if (contextDependencies instanceof Set) {
+        if (!contextDependencies.has(context)) {
+          contextDependencies.add(context);
+        }
+      } else if (Array.isArray(contextDependencies)) {
+        if (contextDependencies.indexOf(context) === -1) {
+          contextDependencies.push(context);
+        }
       }
     });
 
